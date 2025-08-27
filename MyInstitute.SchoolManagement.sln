@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyInstitute.SchoolManagemen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyInstitute.SchoolManagement.Backend", "MyInstitute.SchoolManagement.Backend\MyInstitute.SchoolManagement.Backend.csproj", "{435DE5F3-9FA5-4C36-8D4C-290AC116C5A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyInstitute.SchoolManagement.AccessService", "MyInstitute.SchoolManagement.AccessService\MyInstitute.SchoolManagement.AccessService.csproj", "{997A555A-2362-4F4A-962E-1A13F45841D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{435DE5F3-9FA5-4C36-8D4C-290AC116C5A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{435DE5F3-9FA5-4C36-8D4C-290AC116C5A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{435DE5F3-9FA5-4C36-8D4C-290AC116C5A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{997A555A-2362-4F4A-962E-1A13F45841D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{997A555A-2362-4F4A-962E-1A13F45841D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{997A555A-2362-4F4A-962E-1A13F45841D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{997A555A-2362-4F4A-962E-1A13F45841D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
