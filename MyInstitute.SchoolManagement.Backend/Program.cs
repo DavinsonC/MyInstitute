@@ -1,12 +1,23 @@
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyInstitute.SchoolManagement.AccesData.Data;
+using MyInstitute.SchoolManagement.Helpers;
+using MyInstitute.SchoolManagement.Shared.Models;
+using MyInstitute.SchoolManagement.Shared.ResponsesSec;
+using System.Text;
+using System.Text.Json.Serialization;
+using Vent.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddSwaggerGen(c =>
 {
@@ -39,8 +50,43 @@ builder.Services.AddSwaggerGen(c =>
           }
         });
 });
+//Conexion a la base de datos
+builder.Services.AddDbContext<DataContext>(x =>
+    x.UseSqlServer("name=DevConnection", options => options.MigrationsAssembly("MyInstitute.SchoolManagement.Backend")));
 
 //Inicio de Area de los Serviciios
+
+//Para realizar logueo de los usuarios
+builder.Services.AddIdentity<User, IdentityRole>(cfg =>
+{
+    //Agregamos Validar Correo para dar de alta al Usuario
+    cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+    cfg.SignIn.RequireConfirmedEmail = true;
+
+    cfg.User.RequireUniqueEmail = true;
+    cfg.Password.RequireDigit = false;
+    cfg.Password.RequiredUniqueChars = 0;
+    cfg.Password.RequireLowercase = false;
+    cfg.Password.RequireNonAlphanumeric = false;
+    cfg.Password.RequireUppercase = false;
+    //Sistema para bloquear por 5 minutos al usuario por intento fallido
+    cfg.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);  //TODO: Cambiar a 5 minutos
+    cfg.Lockout.MaxFailedAccessAttempts = 3;
+    cfg.Lockout.AllowedForNewUsers = true;
+}).AddDefaultTokenProviders()  //Complemento Validar Correo
+  .AddEntityFrameworkStores<DataContext>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddCookie()
+    .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
+        ClockSkew = TimeSpan.Zero
+    });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>
@@ -53,6 +99,28 @@ builder.Services.AddCors(options =>
     });
 });
 
+//// Leer configuración de RabbitMQ
+//var rabbitSettings = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqSettings>();
+//builder.Services.AddSingleton(rabbitSettings!);
+
+//// Configurar MassTransit
+//builder.Services.AddMassTransit(x =>
+//{
+//    x.UsingRabbitMq((context, cfg) =>
+//    {
+//        cfg.Host(rabbitSettings!.Host, "/", h =>
+//        {
+//            h.Username(rabbitSettings.Username);
+//            h.Password(rabbitSettings.Password);
+//        });
+//    });
+//});
+//builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
+builder.Services.AddScoped<IFileStorage, FileStorage>();
+builder.Services.AddScoped<IUserHelper, UserHelper>();
+builder.Services.AddScoped<IEmailHelper, EmailHelper>();
+builder.Services.AddScoped<IUtilityTools, UtilityTools>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,6 +132,7 @@ if (app.Environment.IsDevelopment())
     string swaggerUrl = "https://localhost:7293/swagger"; // URL de Swagger
     Task.Run(() => OpenBrowser(swaggerUrl));
 }
+
 //Llamar el Servicio de CORS
 app.UseCors("AllowSpecificOrigin");
 

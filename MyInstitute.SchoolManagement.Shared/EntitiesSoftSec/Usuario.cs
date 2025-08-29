@@ -18,7 +18,7 @@ public class Usuario
     [Display(Name = "Apellidos")]
     public string LastName { get; set; } = null!;
 
-    [MaxLength(100, ErrorMessage = "El campo no puede ser mayor a {1} de largo")]
+    [MaxLength(100, ErrorMessage = "El campo no puede ser mayor a {100} de largo")]
     public string? FullName { get; set; }
 
     [Required(ErrorMessage = "El {0} es Obligatorio")]

@@ -8,6 +8,7 @@ public class CategoryConfig : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
+        builder.ToTable("Usuario");
         builder.HasKey(e => e.UsuarioId);
         builder.HasIndex(e => e.UserName).IsUnique();
         //Evitar el borrado en cascada

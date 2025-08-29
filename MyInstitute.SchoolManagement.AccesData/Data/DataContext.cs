@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MyInstitute.SchoolManagement.Shared.EntitiesSoftSec;
 using MyInstitute.SchoolManagement.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ public class DataContext : IdentityDbContext<User>
     }
 
     //Entities
-
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
